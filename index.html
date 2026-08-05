@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ferro — Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600;700;900&family=Fraunces:ital,wght@1,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#160F1D;
+    --surface:#201628;
+    --surface-hi:#2A1C35;
+    --ink:#F2EAF6;
+    --ink-dim:#C9BBD3;
+    --accent:#FF6FA5;
+    --accent-dim:#B84E75;
+    --line:rgba(242,234,246,0.10);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Manrope',sans-serif;
+    overflow-x:hidden;
+    width:100%;
+  }
+  a{color:inherit;text-decoration:none;}
+
+  ::selection{background:var(--accent);color:#160F1D;}
+
+  .noise{
+    position:fixed; inset:0; pointer-events:none; z-index:1;
+    background-image:radial-gradient(circle at 1px 1px, rgba(242,234,246,0.035) 1px, transparent 0);
+    background-size:3px 3px;
+    opacity:0.6;
+  }
+
+  h1,h2,h3{font-family:'Fraunces',serif;}
+
+  /* ===== Top mark ===== */
+  .brand{
+    position:fixed; top:24px; left:24px; z-index:50;
+    font-family:'Fraunces',serif; font-weight:700; font-size:20px;
+    letter-spacing:0.5px;
+  }
+  .brand span{color:var(--accent); font-style:italic; font-weight:500;}
+  .est{
+    position:fixed; top:28px; right:24px; z-index:50;
+    font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--ink-dim);
+  }
+
+  /* ===== Layout wrapper ===== */
+  .wrap{
+    max-width:1440px;
+    margin:0 auto;
+    padding:96px 24px 140px;
+  }
+
+  .intro{
+    padding:0 4px 40px;
+    max-width:780px;
+  }
+  .intro .eyebrow{
+    display:inline-block;
+    font-size:12px; letter-spacing:3px; text-transform:uppercase;
+    color:var(--accent); font-weight:700; margin-bottom:18px;
+  }
+  .intro h1{
+    font-size:clamp(36px,6vw,68px);
+    line-height:1.02;
+    font-weight:600;
+    letter-spacing:-0.5px;
+  }
+  .intro h1 em{color:var(--accent); font-style:italic; font-weight:500;}
+  .intro p{
+    margin-top:20px;
+    font-size:17px;
+    line-height:1.6;
+    color:var(--ink-dim);
+    max-width:560px;
+  }
+
+  /* ===== Bento Grid ===== */
+  .bento{
+    display:grid;
+    grid-template-columns:repeat(12,1fr);
+    grid-auto-rows:minmax(90px,auto);
+    gap:16px;
+  }
+
+  .cell{
+    position:relative;
+    background:rgba(32,22,40,0.55);
+    border:1px solid var(--line);
+    border-radius:20px;
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    padding:28px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    transition:border-color .35s ease, transform .35s ease, background .35s ease;
+  }
+  .cell::before{
+    content:'';
+    position:absolute; inset:0;
+    background:radial-gradient(120% 100% at 100% 0%, rgba(255,111,165,0.10), transparent 60%);
+    opacity:0;
+    transition:opacity .4s ease;
+    pointer-events:none;
+  }
+  .cell:hover{
+    border-color:rgba(255,111,165,0.4);
+    transform:translateY(-3px);
+    background:rgba(42,28,53,0.65);
+  }
+  .cell:hover::before{opacity:1;}
+
+  .tag{
+    font-size:11px; letter-spacing:2px; text-transform:uppercase;
+    color:var(--ink-dim); font-weight:700; margin-bottom:auto;
+  }
+  .cell h3{
+    font-size:26px; font-weight:600; margin-top:16px; letter-spacing:-0.2px;
+  }
+  .cell p.desc{
+    margin-top:8px; font-size:14px; color:var(--ink-dim); line-height:1.5; max-width:36ch;
+  }
+  .arrow{
+    position:absolute; top:24px; right:24px;
+    width:36px; height:36px; border-radius:50%;
+    border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-size:16px; color:var(--ink-dim);
+    transition:all .3s ease;
+  }
+  .cell:hover .arrow{
+    background:var(--accent); color:#160F1D; border-color:var(--accent);
+    transform:rotate(45deg);
+  }
+
+  /* grid placements */
+  .hero-3d{ grid-column:1 / span 7; grid-row:span 6; padding:0; }
+  .hero-stat{ grid-column:8 / span 5; grid-row:span 3; }
+  .hero-quote{ grid-column:8 / span 5; grid-row:span 3; }
+
+  .cell-blog{ grid-column:1 / span 4; grid-row:span 4; }
+  .cell-design{ grid-column:5 / span 4; grid-row:span 4; }
+  .cell-video{ grid-column:9 / span 4; grid-row:span 4; }
+
+  .cell-podcast{ grid-column:1 / span 12; grid-row:span 5; }
+
+  .cell-cta{ grid-column:1 / span 5; grid-row:span 3; }
+  .cell-contact{ grid-column:6 / span 7; grid-row:span 3; }
+
+  /* Hero 3D canvas cell */
+  .hero-3d{
+    background:radial-gradient(120% 120% at 30% 20%, #2a1c36 0%, #160F1D 70%);
+    border-radius:24px;
+    position:relative;
+  }
+  #hero-canvas{width:100%; height:100%; display:block; cursor:grab;}
+  #hero-canvas:active{cursor:grabbing;}
+  .hero-3d-label{
+    position:absolute; bottom:28px; left:28px; z-index:5; pointer-events:none;
+  }
+  .hero-3d-label .tag{color:var(--ink-dim);}
+  .hero-3d-label h2{
+    font-size:clamp(28px,3vw,40px); font-weight:600; margin-top:10px; max-width:8ch; line-height:1.05;
+  }
+  .hero-3d-label h2 em{color:var(--accent); font-style:italic;}
+
+  .hero-stat{
+    justify-content:center;
+  }
+  .big-num{
+    font-family:'Fraunces',serif; font-size:clamp(48px,6vw,72px); font-weight:600; color:var(--accent);
+    line-height:1;
+  }
+  .hero-stat p{font-size:13px; color:var(--ink-dim); margin-top:10px; letter-spacing:0.3px;}
+
+  .hero-quote p.manifesto{
+    font-family:'Fraunces',serif; font-style:italic; font-weight:500;
+    font-size:clamp(18px,2vw,22px); line-height:1.4; color:var(--ink);
+  }
+
+  /* Podcast list cell */
+  .cell-podcast{
+    display:block;
+  }
+  .podcast-head{
+    display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:24px;
+  }
+  .podcast-list{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:0;
+    border-top:1px solid var(--line);
+  }
+  .podcast-row{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:16px 14px;
+    border-bottom:1px solid var(--line);
+    font-size:14px;
+    transition:background .25s ease;
+  }
+  .podcast-row:hover{background:rgba(255,111,165,0.06);}
+  .podcast-row .pnum{color:var(--ink-dim); font-size:12px; margin-right:14px; font-variant-numeric:tabular-nums;}
+  .podcast-row .pname{font-weight:600; flex:1;}
+  .podcast-row .pep{color:var(--ink-dim); font-size:12px; white-space:nowrap; margin-left:12px;}
+  .podcast-list-wrap{border-right:1px solid var(--line);}
+  .podcast-list-wrap:last-child{border-right:none;}
+  @media (max-width:900px){
+    .podcast-list{grid-template-columns:1fr;}
+  }
+
+  .cell-cta{
+    background:linear-gradient(135deg, rgba(255,111,165,0.16), rgba(32,22,40,0.55));
+  }
+  .cell-cta h3{font-size:28px;}
+  .cell-cta .btn{
+    margin-top:18px;
+    display:inline-flex; align-items:center; gap:8px;
+    background:var(--accent); color:#160F1D;
+    padding:12px 22px; border-radius:100px;
+    font-weight:700; font-size:14px;
+    width:fit-content;
+  }
+
+  .cell-contact{
+    display:flex; flex-direction:row; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap;
+  }
+  .cell-contact h3{font-size:24px; max-width:16ch;}
+  .contact-links{display:flex; flex-direction:column; gap:6px; font-size:14px;}
+  .contact-links a{color:var(--ink-dim); transition:color .25s ease;}
+  .contact-links a:hover{color:var(--accent);}
+
+  /* ===== Bottom dock nav ===== */
+  .dock{
+    position:fixed; bottom:18px; left:50%; transform:translateX(-50%);
+    z-index:100;
+    display:flex; align-items:center; gap:4px;
+    background:rgba(32,22,40,0.75);
+    border:1px solid var(--line);
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+    border-radius:100px;
+    padding:8px;
+  }
+  .dock a{
+    padding:10px 18px;
+    font-size:13px; font-weight:700;
+    border-radius:100px;
+    color:var(--ink-dim);
+    letter-spacing:0.2px;
+    transition:all .25s ease;
+    white-space:nowrap;
+  }
+  .dock a:hover, .dock a.active{
+    background:var(--accent);
+    color:#160F1D;
+  }
+  .dock .dot{
+    width:6px; height:6px; border-radius:50%; background:var(--accent);
+    margin:0 6px;
+  }
+
+  /* ===== Footer wordmark ===== */
+  .footer{
+    position:relative;
+    padding-top:60px;
+    text-align:center;
+    overflow:hidden;
+  }
+  .footer .foot-top{
+    font-size:13px; color:var(--ink-dim); letter-spacing:1px;
+  }
+  .footer .wordmark{
+    font-family:'Fraunces',serif;
+    font-weight:700;
+    font-size:min(24vw,320px);
+    line-height:0.8;
+    letter-spacing:-2px;
+    color:transparent;
+    -webkit-text-stroke:1px rgba(242,234,246,0.5);
+    margin-top:20px;
+    transform:translateY(28%);
+    user-select:none;
+    background:linear-gradient(180deg, rgba(242,234,246,0.18), rgba(242,234,246,0));
+    -webkit-background-clip:text;
+    background-clip:text;
+  }
+
+  @media (max-width:1000px){
+    .hero-3d{grid-column:1/span 12; grid-row:span 5;}
+    .hero-stat{grid-column:1/span 6; grid-row:span 3;}
+    .hero-quote{grid-column:7/span 6; grid-row:span 3;}
+    .cell-blog, .cell-design, .cell-video{grid-column:1/span 12; grid-row:span 3;}
+    .cell-cta{grid-column:1/span 12;}
+    .cell-contact{grid-column:1/span 12;}
+  }
+  @media (max-width:600px){
+    .hero-stat{grid-column:1/span 12;}
+    .hero-quote{grid-column:1/span 12;}
+    .dock{gap:0; padding:6px;}
+    .dock a{padding:9px 12px; font-size:12px;}
+    .dock .dot{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="noise"></div>
+<div class="brand">Vellow<span>studio</span></div>
+<div class="est">Est. reel 09</div>
+
+<div class="wrap">
+
+  <div class="intro">
+    <span class="eyebrow">Portfolio index</span>
+    <h1>I cut, shoot, design<br>and <em>mix</em> for a living.</h1>
+    <p>One person, four disciplines. Scroll the mosaic below — every tile is a door into a different part of the work. Nothing here is decorative. Click something.</p>
+  </div>
+
+  <div class="bento">
+
+    <div class="cell hero-3d">
+      <div id="hero-canvas"></div>
+      <div class="hero-3d-label">
+        <span class="tag">Drag to orbit</span>
+        <h2>The <em>work</em>,<br>rendered.</h2>
+      </div>
+    </div>
+
+    <div class="cell hero-stat">
+      <div class="big-num">120+</div>
+      <p>Projects shipped across video, design, and audio since the studio opened.</p>
+    </div>
+
+    <div class="cell hero-quote">
+      <p class="manifesto">"Good editing is invisible. Good design is not. I refuse to choose — you get both, sharpened."</p>
+    </div>
+
+    <a class="cell cell-blog" href="#blog">
+      <div class="arrow">↗</div>
+      <span class="tag">01 — Writing</span>
+      <h3>Blog</h3>
+      <p class="desc">Field notes on craft, tools, and the mistakes worth repeating. Long-form, no fluff.</p>
+    </a>
+
+    <a class="cell cell-design" href="#design">
+      <div class="arrow">↗</div>
+      <span class="tag">02 — Visual</span>
+      <h3>Designs</h3>
+      <p class="desc">Brand systems, key art, and motion frames pulled from real client work.</p>
+    </a>
+
+    <a class="cell cell-video" href="#video">
+      <div class="arrow">↗</div>
+      <span class="tag">03 — Motion</span>
+      <h3>Video Editing</h3>
+      <p class="desc">Narrative cuts, sizzle reels, and color-graded sequences that hold attention.</p>
+    </a>
+
+    <div class="cell cell-podcast" id="podcasts">
+      <div class="podcast-head">
+        <div>
+          <span class="tag">04 — Audio post</span>
+          <h3>Podcast Postproduction</h3>
+        </div>
+        <div class="arrow" style="position:static;">↗</div>
+      </div>
+      <div class="podcast-list">
+        <div class="podcast-list-wrap">
+          <div class="podcast-row"><span class="pnum">01</span><span class="pname">Nightshift Radio</span><span class="pep">142 eps</span></div>
+          <div class="podcast-row"><span class="pnum">02</span><span class="pname">Marrow & Marble</span><span class="pep">76 eps</span></div>
+          <div class="podcast-row"><span class="pnum">03</span><span class="pname">Static Interval</span><span class="pep">58 eps</span></div>
+          <div class="podcast-row"><span class="pnum">04</span><span class="pname">The Long Exhale</span><span class="pep">33 eps</span></div>
+        </div>
+        <div class="podcast-list-wrap">
+          <div class="podcast-row"><span class="pnum">05</span><span class="pname">Faultline Weekly</span><span class="pep">91 eps</span></div>
+          <div class="podcast-row"><span class="pnum">06</span><span class="pname">Paper Moths</span><span class="pep">24 eps</span></div>
+          <div class="podcast-row"><span class="pnum">07</span><span class="pname">Undertow</span><span class="pep">67 eps</span></div>
+          <div class="podcast-row"><span class="pnum">08</span><span class="pname">Corridor Nine</span><span class="pep">40 eps</span></div>
+        </div>
+        <div class="podcast-list-wrap">
+          <div class="podcast-row"><span class="pnum">09</span><span class="pname">Hollow Frequencies</span><span class="pep">55 eps</span></div>
+          <div class="podcast-row"><span class="pnum">10</span><span class="pname">Late Bloom</span><span class="pep">19 eps</span></div>
+          <div class="podcast-row"><span class="pnum">11</span><span class="pname">Ash & Antenna</span><span class="pep">88 eps</span></div>
+          <div class="podcast-row"><span class="pnum">12</span><span class="pname">The Quiet Hour</span><span class="pep">12 eps</span></div>
+        </div>
+      </div>
+    </div>
+
+    <a class="cell cell-cta" href="#contact">
+      <span class="tag">Open for work</span>
+      <h3>Let's make something that doesn't get skipped.</h3>
+      <span class="btn">Start a project →</span>
+    </a>
+
+    <div class="cell cell-contact">
+      <h3>Based anywhere, working everywhere.</h3>
+      <div class="contact-links">
+        <a href="#">hello@vellow.studio</a>
+        <a href="#">Instagram</a>
+        <a href="#">Twitter / X</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<nav class="dock">
+  <a href="#blog" class="active">Blog</a>
+  <span class="dot"></span>
+  <a href="#design">Designs</a>
+  <span class="dot"></span>
+  <a href="#video">Video</a>
+  <span class="dot"></span>
+  <a href="#podcasts">Podcasts</a>
+</nav>
+
+<div class="footer">
+  <div class="foot-top">Scroll ends here</div>
+  <div class="wordmark">Vellow</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+  const container = document.getElementById('hero-canvas');
+  let W = container.clientWidth, H = container.clientHeight;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, W/H, 0.1, 100);
+  camera.position.set(0, 0, 9);
+
+  const renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(W, H);
+  container.appendChild(renderer.domElement);
+
+  const accent = new THREE.Color(0xFF6FA5);
+  const inkColor = new THREE.Color(0xF2EAF6);
+  const plum = new THREE.Color(0x2A1C35);
+
+  scene.add(new THREE.AmbientLight(0x2A1C35, 1.2));
+  const key = new THREE.PointLight(0xFF6FA5, 3.2, 30);
+  key.position.set(4, 5, 6);
+  scene.add(key);
+  const rim = new THREE.PointLight(0xF2EAF6, 1.4, 30);
+  rim.position.set(-5, -3, -4);
+  scene.add(rim);
+
+  const group = new THREE.Group();
+  scene.add(group);
+
+  const geoms = [
+    new THREE.IcosahedronGeometry(1, 0),
+    new THREE.OctahedronGeometry(0.9, 0),
+    new THREE.TorusGeometry(0.7, 0.22, 16, 60),
+    new THREE.TetrahedronGeometry(0.85, 0),
+    new THREE.BoxGeometry(1.1,1.1,1.1),
+    new THREE.DodecahedronGeometry(0.8, 0)
+  ];
+
+  const meshes = [];
+  const count = 9;
+  for(let i=0;i<count;i++){
+    const geo = geoms[i % geoms.length];
+    const isAccent = i % 3 === 0;
+    const mat = new THREE.MeshStandardMaterial({
+      color: isAccent ? accent : plum,
+      metalness: 0.35,
+      roughness: 0.35,
+      emissive: isAccent ? accent : 0x000000,
+      emissiveIntensity: isAccent ? 0.18 : 0,
+      wireframe: i % 4 === 1
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    const radius = 2.4 + Math.random()*1.6;
+    const theta = (i / count) * Math.PI * 2;
+    mesh.position.set(
+      Math.cos(theta) * radius,
+      (Math.random()-0.5) * 3.2,
+      Math.sin(theta) * radius * 0.6
+    );
+    const scale = 0.35 + Math.random()*0.4;
+    mesh.scale.setScalar(scale);
+    mesh.userData = {
+      speed: 0.2 + Math.random()*0.4,
+      axis: new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, Math.random()-0.5).normalize(),
+      floatOffset: Math.random()*Math.PI*2,
+      baseY: mesh.position.y
+    };
+    group.add(mesh);
+    meshes.push(mesh);
+  }
+
+  // thin edge lines connecting nodes for a "network" feel
+  const lineMat = new THREE.LineBasicMaterial({color:0xF2EAF6, transparent:true, opacity:0.08});
+  for(let i=0;i<meshes.length;i++){
+    const a = meshes[i];
+    const b = meshes[(i+2)%meshes.length];
+    const geo = new THREE.BufferGeometry().setFromPoints([a.position.clone(), b.position.clone()]);
+    scene.add(new THREE.Line(geo, lineMat));
+  }
+
+  // particle dust
+  const dustCount = 200;
+  const dustGeo = new THREE.BufferGeometry();
+  const positions = new Float32Array(dustCount*3);
+  for(let i=0;i<dustCount;i++){
+    positions[i*3] = (Math.random()-0.5)*14;
+    positions[i*3+1] = (Math.random()-0.5)*8;
+    positions[i*3+2] = (Math.random()-0.5)*8 - 2;
+  }
+  dustGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const dustMat = new THREE.PointsMaterial({color:0xFF6FA5, size:0.02, transparent:true, opacity:0.6});
+  const dust = new THREE.Points(dustGeo, dustMat);
+  scene.add(dust);
+
+  // pointer interaction (drag to orbit, no pointer lock)
+  let isDragging = false;
+  let prevX = 0, prevY = 0;
+  let targetRotX = 0, targetRotY = 0;
+  let currentRotX = 0, currentRotY = 0;
+
+  container.addEventListener('pointerdown', (e)=>{
+    isDragging = true;
+    prevX = e.clientX; prevY = e.clientY;
+  });
+  window.addEventListener('pointerup', ()=>{ isDragging = false; });
+  window.addEventListener('pointermove', (e)=>{
+    if(!isDragging) return;
+    const dx = e.clientX - prevX;
+    const dy = e.clientY - prevY;
+    prevX = e.clientX; prevY = e.clientY;
+    targetRotY += dx * 0.005;
+    targetRotX += dy * 0.005;
+    targetRotX = Math.max(-0.6, Math.min(0.6, targetRotX));
+  });
+
+  // gentle auto-parallax on mousemove within cell when not dragging
+  container.addEventListener('mousemove', (e)=>{
+    if(isDragging) return;
+    const rect = container.getBoundingClientRect();
+    const nx = (e.clientX - rect.left) / rect.width - 0.5;
+    const ny = (e.clientY - rect.top) / rect.height - 0.5;
+    targetRotY = nx * 0.4;
+    targetRotX = ny * 0.25;
+  });
+
+  function resize(){
+    W = container.clientWidth; H = container.clientHeight;
+    if(W === 0 || H === 0) return;
+    camera.aspect = W/H;
+    camera.updateProjectionMatrix();
+    renderer.setSize(W, H);
+  }
+  window.addEventListener('resize', resize);
+
+  const clock = new THREE.Clock();
+  function animate(){
+    requestAnimationFrame(animate);
+    const t = clock.getElapsedTime();
+
+    currentRotX += (targetRotX - currentRotX) * 0.06;
+    currentRotY += (targetRotY - currentRotY) * 0.06;
+    group.rotation.x = currentRotX;
+    group.rotation.y = currentRotY + t * 0.05;
+
+    meshes.forEach(m=>{
+      m.rotation.x += 0.004 * m.userData.speed * 5 * 0.02;
+      m.rotation.y += 0.006 * m.userData.speed * 5 * 0.02;
+      m.position.y = m.userData.baseY + Math.sin(t * m.userData.speed + m.userData.floatOffset) * 0.3;
+    });
+
+    dust.rotation.y = t * 0.02;
+
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  // handle case where container size becomes available after layout
+  setTimeout(resize, 50);
+})();
+</script>
+
+<script>
+  // smooth-ish anchor behavior + active dock state on scroll into view
+  const dockLinks = document.querySelectorAll('.dock a');
+  const targets = ['blog','design','video','podcasts'].map(id=>document.querySelector(`[href="#${id}"]`) ? id : id);
+
+  const sectionMap = {
+    blog: document.querySelector('.cell-blog'),
+    design: document.querySelector('.cell-design'),
+    video: document.querySelector('.cell-video'),
+    podcasts: document.querySelector('#podcasts')
+  };
+
+  window.addEventListener('scroll', ()=>{
+    let current = 'blog';
+    Object.entries(sectionMap).forEach(([key, el])=>{
+      if(!el) return;
+      const rect = el.getBoundingClientRect();
+      if(rect.top < window.innerHeight*0.6){
+        current = key;
+      }
+    });
+    dockLinks.forEach(a=>{
+      a.classList.toggle('active', a.getAttribute('href') === '#'+current);
+    });
+  });
+</script>
+
+</body>
+</html>
